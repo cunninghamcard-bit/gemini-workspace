@@ -1,8 +1,8 @@
 import * as z from "zod/v4";
 
-export const DEVSPACE_CONFIG_VERSION = 1 as const;
+export const GEMINI_WORKSPACE_CONFIG_VERSION = 1 as const;
 
-export const DEVSPACE_CONFIG_SCHEMA_URL =
+export const GEMINI_WORKSPACE_CONFIG_SCHEMA_URL =
   "https://raw.githubusercontent.com/Waishnav/devspace/main/schema/v1/devspace.schema.json";
 
 export const DEFAULT_AGY_EXPOSED_TOOLS = [
@@ -22,7 +22,7 @@ const serverConfigSchema = z.object({
 }).passthrough().prefault({});
 
 const storageConfigSchema = z.object({
-  stateDir: z.string().trim().min(1).default("~/.local/share/devspace"),
+  stateDir: z.string().trim().min(1).default("~/.local/share/gemini-workspace"),
 }).passthrough().prefault({});
 
 const agyConfigSchema = z.object({
@@ -88,13 +88,13 @@ const oauthConfigSchema = z.object({
 }).passthrough().prefault({});
 
 /**
- * `.passthrough()` allows existing `~/.devspace/config.jsonc` files written by
+ * `.passthrough()` allows existing config.jsonc files written by
  * older Synrex/DevSpace versions (`node`, `cluster`, `workspaces`, `tools`, etc.)
  * to load without breaking.
  */
-export const devspaceConfigSchema = z.object({
-  $schema: z.string().url().default(DEVSPACE_CONFIG_SCHEMA_URL),
-  configVersion: z.literal(DEVSPACE_CONFIG_VERSION).default(DEVSPACE_CONFIG_VERSION),
+export const geminiWorkspaceConfigSchema = z.object({
+  $schema: z.string().url().default(GEMINI_WORKSPACE_CONFIG_SCHEMA_URL),
+  configVersion: z.literal(GEMINI_WORKSPACE_CONFIG_VERSION).default(GEMINI_WORKSPACE_CONFIG_VERSION),
   server: serverConfigSchema,
   storage: storageConfigSchema,
   agy: agyConfigSchema,
@@ -106,9 +106,9 @@ export const devspaceConfigSchema = z.object({
   oauth: oauthConfigSchema,
 }).passthrough();
 
-export type DevspaceConfig = z.output<typeof devspaceConfigSchema>;
-export type DevspaceConfigInput = z.input<typeof devspaceConfigSchema>;
+export type GeminiWorkspaceConfig = z.output<typeof geminiWorkspaceConfigSchema>;
+export type GeminiWorkspaceConfigInput = z.input<typeof geminiWorkspaceConfigSchema>;
 
-export function defaultDevspaceConfig(): DevspaceConfig {
-  return devspaceConfigSchema.parse({ configVersion: DEVSPACE_CONFIG_VERSION });
+export function defaultGeminiWorkspaceConfig(): GeminiWorkspaceConfig {
+  return geminiWorkspaceConfigSchema.parse({ configVersion: GEMINI_WORKSPACE_CONFIG_VERSION });
 }

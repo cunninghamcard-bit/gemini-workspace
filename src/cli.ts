@@ -12,12 +12,12 @@ import { shutdownHttpServer } from "./server-shutdown.js";
 import { discoverLocalSkills } from "./skills.js";
 import {
   generateOwnerToken,
-  loadDevspaceFiles,
-  setDevspaceConfigValue,
-  writeDevspaceAuth,
-  writeDevspaceConfig,
+  loadGeminiWorkspaceFiles,
+  setGeminiWorkspaceConfigValue,
+  writeGeminiWorkspaceAuth,
+  writeGeminiWorkspaceConfig,
 } from "./user-config.js";
-import { DEVSPACE_VERSION } from "./version.js";
+import { GEMINI_WORKSPACE_VERSION } from "./version.js";
 
 type Command =
   | "serve"
@@ -57,7 +57,7 @@ async function main(argv: string[]): Promise<void> {
       printHelp();
       return;
     case "version":
-      console.log(DEVSPACE_VERSION);
+      console.log(GEMINI_WORKSPACE_VERSION);
       return;
   }
 }
@@ -96,7 +96,7 @@ async function runServe(): Promise<void> {
 }
 
 function runInit(args: string[]): void {
-  const files = loadDevspaceFiles();
+  const files = loadGeminiWorkspaceFiles();
   let publicUrl: string | undefined;
   for (let i = 0; i < args.length; i += 1) {
     if (args[i] === "--public-url" && args[i + 1]) {
@@ -106,17 +106,17 @@ function runInit(args: string[]): void {
   }
 
   if (!files.configExists) {
-    writeDevspaceConfig({
+    writeGeminiWorkspaceConfig({
       configVersion: 1,
       server: publicUrl ? { publicBaseUrl: publicUrl } : {},
     });
   } else if (publicUrl) {
-    setDevspaceConfigValue(["server", "publicBaseUrl"], publicUrl);
+    setGeminiWorkspaceConfigValue(["server", "publicBaseUrl"], publicUrl);
   }
 
   if (!files.auth.ownerToken) {
     const token = generateOwnerToken();
-    const authPath = writeDevspaceAuth({ ownerToken: token });
+    const authPath = writeGeminiWorkspaceAuth({ ownerToken: token });
     console.log(`Generated owner token in ${authPath}`);
   } else {
     console.log(`Existing owner token preserved in ${files.authPath}`);
@@ -176,7 +176,7 @@ async function runDoctor(): Promise<void> {
 
 function runConfigCommand(args: string[]): void {
   const [sub, key, rawVal] = args;
-  const files = loadDevspaceFiles();
+  const files = loadGeminiWorkspaceFiles();
   if (!sub || sub === "show" || sub === "path") {
     console.log(files.configPath);
     console.log(JSON.stringify(files.config, null, 2));
@@ -189,7 +189,7 @@ function runConfigCommand(args: string[]): void {
     } catch {
       // treat as string
     }
-    const updatedPath = setDevspaceConfigValue(key.split("."), parsed as Record<string, unknown>);
+    const updatedPath = setGeminiWorkspaceConfigValue(key.split("."), parsed as Record<string, unknown>);
     console.log(`Updated ${updatedPath}`);
     return;
   }

@@ -41,7 +41,7 @@ test("grace reuse keeps the client, scope, and resource checks", async (t) => {
 });
 
 async function fixture(t: TestContext): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "devspace-oauth-grace-test-"));
+  const root = await mkdtemp(join(tmpdir(), "gemini-workspace-oauth-grace-test-"));
   t.after(async () => {
     Date.now = realDateNow;
     await rm(root, { recursive: true, force: true });

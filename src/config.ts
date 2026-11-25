@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import type { LoggingConfig } from "./logger.js";
 import type { OAuthConfig } from "./oauth-provider.js";
 import { expandHomePath } from "./path-utils.js";
-import { loadDevspaceFiles } from "./user-config.js";
+import { loadGeminiWorkspaceFiles } from "./user-config.js";
 
 export interface AgyBridgeConfig {
   bin: string;
@@ -37,19 +37,19 @@ export interface ServerConfig {
 }
 
 export function resolveDefaultAgyBin(env: NodeJS.ProcessEnv = process.env): string {
-  if (env.DEVSPACE_AGY_BIN?.trim()) {
-    return resolve(expandHomePath(env.DEVSPACE_AGY_BIN));
+  if (env.GEMINI_WORKSPACE_AGY_BIN?.trim()) {
+    return resolve(expandHomePath(env.GEMINI_WORKSPACE_AGY_BIN));
   }
   return join(homedir(), ".local", "bin", "agy");
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
-  const files = loadDevspaceFiles(env);
+  const files = loadGeminiWorkspaceFiles(env);
   const stored = files.config;
   const stateDir = resolve(expandHomePath(stored.storage.stateDir));
   const host = stored.server.host;
   const port = stored.server.port;
-  const listenPortOverride = env.DEVSPACE_LISTEN_PORT ?? env.SYNREX_CORE_LISTEN_PORT;
+  const listenPortOverride = env.GEMINI_WORKSPACE_LISTEN_PORT ?? env.SYNREX_CORE_LISTEN_PORT;
   const listenPort = listenPortOverride !== undefined ? parseListenPort(listenPortOverride) : port;
 
   const publicBaseUrl = parsePublicBaseUrl(
@@ -66,10 +66,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
   ];
 
   const workspace = resolve(
-    expandHomePath(env.DEVSPACE_AGY_WORKSPACE ?? stored.agy.workspace),
+    expandHomePath(env.GEMINI_WORKSPACE_AGY_WORKSPACE ?? stored.agy.workspace),
   );
   const agyHome = resolve(
-    expandHomePath(env.DEVSPACE_AGY_HOME ?? stored.agy.agyHome ?? join(stateDir, "agy-home")),
+    expandHomePath(env.GEMINI_WORKSPACE_AGY_HOME ?? stored.agy.agyHome ?? join(stateDir, "agy-home")),
   );
   const agyBin = stored.agy.bin
     ? resolve(expandHomePath(stored.agy.bin))
@@ -83,7 +83,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     listenPort,
     oauth: {
       ownerToken: parseRequiredSecret(
-        env.DEVSPACE_OAUTH_OWNER_TOKEN ?? files.auth.ownerToken,
+        env.GEMINI_WORKSPACE_OAUTH_OWNER_TOKEN ?? files.auth.ownerToken,
       ),
       accessTokenTtlSeconds: stored.oauth.accessTokenTtlSeconds,
       refreshTokenTtlSeconds: stored.oauth.refreshTokenTtlSeconds,
@@ -98,14 +98,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
       bin: agyBin,
       workspace,
       agyHome,
-      modelId: env.DEVSPACE_AGY_MODEL ?? stored.agy.modelId,
+      modelId: env.GEMINI_WORKSPACE_AGY_MODEL ?? stored.agy.modelId,
       wireProtocol: stored.agy.wireProtocol,
       holdMs: stored.agy.holdMs,
       callTimeoutMs: stored.agy.callTimeoutMs,
       maxTurnsPerSession: stored.agy.maxTurnsPerSession,
       sessionIdleTtlMs: stored.agy.sessionIdleTtlMs,
-      exposedTools: env.DEVSPACE_AGY_TOOLS
-        ? env.DEVSPACE_AGY_TOOLS.split(",").map((s) => s.trim()).filter(Boolean)
+      exposedTools: env.GEMINI_WORKSPACE_AGY_TOOLS
+        ? env.GEMINI_WORKSPACE_AGY_TOOLS.split(",").map((s) => s.trim()).filter(Boolean)
         : stored.agy.exposedTools,
     },
     skills: {
@@ -113,9 +113,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
       paths: stored.skills.paths,
     },
     codeMode: {
-      enabled: env.DEVSPACE_CODE_MODE === "0"
+      enabled: env.GEMINI_WORKSPACE_CODE_MODE === "0"
         ? false
-        : env.DEVSPACE_CODE_MODE === "1"
+        : env.GEMINI_WORKSPACE_CODE_MODE === "1"
           ? true
           : stored.codeMode.enabled,
     },
@@ -149,7 +149,7 @@ function normalizeAllowedHosts(hosts: string[]): string[] {
 function parseRequiredSecret(value: string | undefined): string {
   const secret = value?.trim();
   if (!secret) {
-    throw new Error("OAuth owner token is required. Run: devspace init");
+    throw new Error("OAuth owner token is required. Run: gemini-workspace init");
   }
   if (secret.length < 16) {
     throw new Error("OAuth owner token must be at least 16 characters long.");

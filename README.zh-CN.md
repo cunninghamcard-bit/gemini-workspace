@@ -40,7 +40,7 @@
 - **Code Mode 批处理引擎（`execute` / `poll_execution` / `cancel_execution`）**
   - 允许 Gemini 在单次工具调用里提交一段异步 JS 脚本，在本地循环或并发调用 `tools.read_file`、`tools.edit_file`、`tools.run_command` 再汇总返回——把 20 次工具往返压缩成 **1 次**，彻底绕开网页端单轮工具调用次数上限。
 - **本机 Skills 自动扫描注入**
-  - 启动时自动扫描 `~/.agents/skills`、`~/.claude/skills`、`~/.codex/skills`、`~/.devspace/skills` 下的 `SKILL.md`，拼入 MCP `instructions`（Google 文档确认会直接注入 Gemini 的 System Prompt），模型按需直接 `read_file` 读取。
+  - 启动时自动扫描 `~/.agents/skills`、`~/.claude/skills`、`~/.codex/skills`、`~/.gemini-workspace/skills` 下的 `SKILL.md`，拼入 MCP `instructions`（Google 文档确认会直接注入 Gemini 的 System Prompt），模型按需直接 `read_file` 读取。
 - **自托管 OAuth 2.1 + `/web/` 审计面板**
   - 主人密码（Owner Password）单用户授权页、SQLite 哈希令牌持久化、**300 秒 Refresh Token 轮换宽限期**（彻底杜绝多子代理并发刷新 401）、内置 Gemini Schema 清洗器（无需外挂代理），以及零前端构建的 `/web/` 实时会话调用审计面板。
 
@@ -68,7 +68,7 @@ pnpm build
 # 以 Tailscale Funnel 为例，把本机 7676 端口暴露为 HTTPS：
 tailscale funnel --bg 7676
 
-# 生成 ~/.devspace/config.jsonc 并在 ~/.devspace/auth.json 中生成主人密码：
+# 生成 ~/.gemini-workspace/config.jsonc 并在 ~/.gemini-workspace/auth.json 中生成主人密码：
 ./bin/gemini-workspace.js init --public-url https://你的机器名.你的tailnet.ts.net
 
 # 自检配置、数据库、Skills 与工具列表：
@@ -78,7 +78,7 @@ tailscale funnel --bg 7676
 ./bin/gemini-workspace.js serve
 ```
 
-> **提示：** 自动生成的主人密码保存在 `~/.devspace/auth.json` 的 `ownerToken` 字段中，连接 Gemini 和登录 `https://<你的域名>/web/` 时输入它即可。
+> **提示：** 自动生成的主人密码保存在 `~/.gemini-workspace/auth.json` 的 `ownerToken` 字段中，连接 Gemini 和登录 `https://<你的域名>/web/` 时输入它即可。
 
 ### 4. 在网页版 Gemini 中添加 Connector
 
@@ -88,7 +88,7 @@ tailscale funnel --bg 7676
    https://你的机器名.你的tailnet.ts.net/mcp
    ```
    *（Client ID 和 Secret 留空即可，服务支持 OAuth 动态客户端注册。）*
-3. 跳转到授权页后输入 `~/.devspace/auth.json` 里的 **Owner Password** 点击批准。
+3. 跳转到授权页后输入 `~/.gemini-workspace/auth.json` 里的 **Owner Password** 点击批准。
 4. 打开 Gemini 普通对话或 **Gemini Task**，即可直接读写本地代码库、跑测试和构建！
 
 > ⚠️ **避坑提醒（实测血泪教训）：** Google 会按**主机名（Hostname）**合并自定义 Connector 的 OAuth 账号关联。千万**不要**在同一个域名（哪怕换端口如 `:8443`）下往 Gemini 添加第二个测试 Connector，否则会冲掉主服务的令牌导致 401。如需并行测试其他 MCP 服务，请务必使用不同域名（例如 `cloudflared tunnel` 的 `*.trycloudflare.com`）。

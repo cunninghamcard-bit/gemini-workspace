@@ -11,7 +11,7 @@ export interface DatabaseHandle {
 }
 
 export function databasePath(stateDir: string): string {
-  return join(stateDir, "devspace.sqlite");
+  return join(stateDir, "gemini-workspace.sqlite");
 }
 
 export function openDatabase(stateDir: string): DatabaseHandle {

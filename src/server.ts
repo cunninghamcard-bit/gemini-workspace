@@ -19,7 +19,7 @@ import { logEvent, requestIp, requestPath } from "./logger.js";
 import { SingleUserOAuthProvider } from "./oauth-provider.js";
 import { shutdownHttpServer } from "./server-shutdown.js";
 import { discoverLocalSkills, formatSkillsForInstructions } from "./skills.js";
-import { DEVSPACE_VERSION } from "./version.js";
+import { GEMINI_WORKSPACE_VERSION } from "./version.js";
 
 export interface RunningServer {
   app: express.Express;
@@ -126,7 +126,7 @@ export async function createServer(
     res.json({
       ok: true,
       name: "gemini-workspace",
-      version: DEVSPACE_VERSION,
+      version: GEMINI_WORKSPACE_VERSION,
       activeSessions: bridge.activeSessionCount(),
       skillsCount: discoveredSkills.length,
       codeMode: Boolean(codeMode),
@@ -176,7 +176,7 @@ export async function createServer(
       });
 
       const mcpServer = new Server(
-        { name: "gemini-workspace", version: DEVSPACE_VERSION },
+        { name: "gemini-workspace", version: GEMINI_WORKSPACE_VERSION },
         {
           capabilities: { tools: {} },
           instructions,
@@ -316,7 +316,7 @@ async function isMainModule(): Promise<boolean> {
 if (await isMainModule()) {
   const { app, config, close } = await createServer();
   const httpServer = app.listen(config.listenPort, config.host, () => {
-    console.log(`devspace agy-bridge listening on http://${config.host}:${config.listenPort}/mcp`);
+    console.log(`gemini-workspace listening on http://${config.host}:${config.listenPort}/mcp`);
     console.log(`public base url: ${config.publicBaseUrl}`);
     if (config.ui.enabled) {
       console.log(`activity web ui: ${config.publicBaseUrl}${WORKSPACE_WEB_PATH}/`);
@@ -334,7 +334,7 @@ if (await isMainModule()) {
     void shutdownHttpServer(httpServer, close)
       .then(() => process.exit(0))
       .catch((error) => {
-        console.error("devspace shutdown failed", error);
+        console.error("gemini-workspace shutdown failed", error);
         process.exit(1);
       });
   };

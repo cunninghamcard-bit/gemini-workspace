@@ -26,7 +26,7 @@ export function discoverLocalSkills(config: SkillsDiscoveryConfig): DiscoveredSk
     join(home, ".agents", "skills"),
     join(home, ".claude", "skills"),
     join(home, ".codex", "skills"),
-    join(home, ".devspace", "skills"),
+    join(home, ".gemini-workspace", "skills"),
   ];
 
   const visitedDirs = new Set<string>();

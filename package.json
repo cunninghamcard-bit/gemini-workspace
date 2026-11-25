@@ -13,8 +13,7 @@
   },
   "packageManager": "pnpm@11.25.0",
   "bin": {
-    "gemini-workspace": "bin/gemini-workspace.js",
-    "devspace": "bin/devspace.js"
+    "gemini-workspace": "bin/gemini-workspace.js"
   },
   "files": [
     "bin",

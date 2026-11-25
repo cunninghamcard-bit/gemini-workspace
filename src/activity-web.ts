@@ -3,7 +3,7 @@ import express, { type Request, type Response, type Router } from "express";
 import type { ActivityStore } from "./activity-store.js";
 
 export const WORKSPACE_WEB_PATH = "/web";
-const SESSION_COOKIE = "devspace_web_session";
+const SESSION_COOKIE = "gemini_workspace_web_session";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1_000;
 const LOGIN_WINDOW_MS = 15 * 60 * 1_000;
 const MAX_FAILED_LOGINS = 10;
@@ -153,7 +153,7 @@ function renderLoginHtml(error?: string): string {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DevSpace Activity</title>
+  <title>Gemini Workspace Activity</title>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: #0b1120; color: #e2e8f0; }
     main { max-width: 400px; margin: 14vh auto; padding: 28px; background: #111827; border: 1px solid #1f2937; border-radius: 14px; }
@@ -166,7 +166,7 @@ function renderLoginHtml(error?: string): string {
 </head>
 <body>
   <main>
-    <h1>DevSpace AGY Activity</h1>
+    <h1>Gemini Workspace AGY Activity</h1>
     <p>Enter your owner password to inspect recent Gemini MCP sessions and tool calls.</p>
     ${error ? `<div class="err">${esc(error)}</div>` : ""}
     <form method="post" action="${WORKSPACE_WEB_PATH}/login">
@@ -218,7 +218,7 @@ function renderDashboardHtml(data: {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DevSpace AGY Activity</title>
+  <title>Gemini Workspace AGY Activity</title>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: #0b1120; color: #e2e8f0; }
     header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #1f2937; background: #0f172a; }
@@ -245,7 +245,7 @@ function renderDashboardHtml(data: {
 </head>
 <body>
   <header>
-    <h1>DevSpace AGY Bridge · Activity</h1>
+    <h1>Gemini Workspace AGY Bridge · Activity</h1>
     <div class="hdr-right">
       <span>Live AGY sessions: <strong>${data.activeSessions}</strong></span>
       <a class="btn" href="${WORKSPACE_WEB_PATH}/${data.selectedSession ? `?session=${encodeURIComponent(data.selectedSession)}` : ""}">Refresh</a>

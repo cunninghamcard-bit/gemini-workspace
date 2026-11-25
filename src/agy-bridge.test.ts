@@ -7,7 +7,7 @@ import test, { type TestContext } from "node:test";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { AgyBridge } from "./agy-bridge.js";
-import { devspaceConfigSchema } from "./config-schema.js";
+import { geminiWorkspaceConfigSchema } from "./config-schema.js";
 import type { ServerConfig } from "./config.js";
 import { SingleUserOAuthProvider } from "./oauth-provider.js";
 import { cleanGeminiToolSchema } from "./schema-clean.js";
@@ -44,7 +44,7 @@ test("schema cleaner strips Gemini-incompatible keywords and lowercases types", 
 });
 
 test("config schema accepts legacy Synrex keys and defaults refreshTokenGraceSeconds to 300", () => {
-  const parsed = devspaceConfigSchema.parse({
+  const parsed = geminiWorkspaceConfigSchema.parse({
     configVersion: 1,
     server: {
       host: "127.0.0.1",
@@ -54,7 +54,7 @@ test("config schema accepts legacy Synrex keys and defaults refreshTokenGraceSec
     node: { alias: null, labels: {} },
     cluster: { role: "standalone" },
     workspaces: { allowedRoots: ["/Users/test"] },
-    storage: { stateDir: "~/.local/share/devspace", metadataRetentionDays: 90 },
+    storage: { stateDir: "~/.local/share/gemini-workspace", metadataRetentionDays: 90 },
     tools: { mode: "codex" },
   });
 
@@ -71,7 +71,7 @@ test("config schema accepts legacy Synrex keys and defaults refreshTokenGraceSec
 test(
   "end-to-end AGY MCP bridge: tools, PNG read, multi-subagent concurrency, 10s+ single-call hold, and session isolation",
   async (t: TestContext) => {
-    const root = await mkdtemp(join(tmpdir(), "devspace-agy-e2e-"));
+    const root = await mkdtemp(join(tmpdir(), "gemini-workspace-agy-e2e-"));
     t.after(() => rm(root, { recursive: true, force: true }));
 
     const stateDir = join(root, "state");
@@ -405,7 +405,7 @@ test(
     });
     assert.equal(loginRes.status, 303);
     const cookie = loginRes.headers.get("set-cookie")?.split(";")[0] ?? "";
-    assert.match(cookie, /^devspace_web_session=/);
+    assert.match(cookie, /^gemini_workspace_web_session=/);
 
     const authWeb = await fetch(`${baseServerConfig.publicBaseUrl}/web/api/calls`, {
       headers: { cookie },
@@ -440,7 +440,7 @@ test(
 );
 
 test("deterministic agy 1.5.10 parity contracts: validation, read_file pagination, write/edit semantics, PTY & process-group kill", async (t) => {
-  const root = await mkdtemp(join(tmpdir(), "devspace-agy-contracts-"));
+  const root = await mkdtemp(join(tmpdir(), "gemini-workspace-agy-contracts-"));
   t.after(() => rm(root, { recursive: true, force: true }));
 
   const workspace = join(root, "ws");

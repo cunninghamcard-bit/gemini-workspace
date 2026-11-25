@@ -40,7 +40,7 @@ Most local coding MCP servers (`Desktop Commander`, `DevSpace`, `Filesystem MCP`
 - **Code Mode (`execute` / `poll_execution` / `cancel_execution`)**
   - Run an async JavaScript snippet on your machine calling `tools.read_file`, `tools.edit_file`, `tools.run_command` in loops or `Promise.all`—collapsing 20+ operations into a **single Gemini tool call**.
 - **Automatic Local Skills Injection**
-  - Scans `~/.agents/skills`, `~/.claude/skills`, `~/.codex/skills`, and `~/.devspace/skills` (`SKILL.md`) into MCP `instructions` (injected directly into Gemini Web's system prompt).
+  - Scans `~/.agents/skills`, `~/.claude/skills`, `~/.codex/skills`, and `~/.gemini-workspace/skills` (`SKILL.md`) into MCP `instructions` (injected directly into Gemini Web's system prompt).
 - **OAuth 2.1 + `/web/` Activity Dashboard**
   - Single-owner password approval page, SHA-256 hashed SQLite token store with a **300-second refresh-token rotation grace window**, built-in Gemini Schema sanitizer, and a zero-build `/web/` UI to inspect every subagent session and tool call.
 
@@ -94,7 +94,7 @@ pnpm build
 # Expose local port 7676 over HTTPS (example using Tailscale Funnel):
 tailscale funnel --bg 7676
 
-# Initialize ~/.devspace/config.jsonc and generate your Owner Password in ~/.devspace/auth.json:
+# Initialize ~/.gemini-workspace/config.jsonc and generate your Owner Password in ~/.gemini-workspace/auth.json:
 ./bin/gemini-workspace.js init --public-url https://your-machine.your-tailnet.ts.net
 
 # Verify everything is ready:
@@ -104,7 +104,7 @@ tailscale funnel --bg 7676
 ./bin/gemini-workspace.js serve
 ```
 
-> **Tip:** Your generated Owner Password is saved in `~/.devspace/auth.json` (`ownerToken`). You will enter it once when authorizing Gemini Web or signing into `https://<your-host>/web/`.
+> **Tip:** Your generated Owner Password is saved in `~/.gemini-workspace/auth.json` (`ownerToken`). You will enter it once when authorizing Gemini Web or signing into `https://<your-host>/web/`.
 
 ### 4. Connect to Google Gemini Web
 
@@ -114,7 +114,7 @@ tailscale funnel --bg 7676
    https://your-machine.your-tailnet.ts.net/mcp
    ```
    *(Leave Client ID / Secret blank — Gemini Workspace supports dynamic OAuth client registration.)*
-3. Approve the connection using your **Owner Password** from `~/.devspace/auth.json`.
+3. Approve the connection using your **Owner Password** from `~/.gemini-workspace/auth.json`.
 4. Open a chat (or **Gemini Task**) and start coding directly against your local repositories!
 
 > ⚠️ **Important Google Connector Caveat:** Google binds custom connectors by **hostname** (`*.your-tailnet.ts.net`). Do **not** register a second test connector on the same hostname (even on a different port like `:8443`), or Google will overwrite/revoke the shared OAuth account link. Always use a separate hostname (e.g., `*.trycloudflare.com`) if testing another MCP server alongside production.
@@ -161,7 +161,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.gemini-workspace.ser
 
 ---
 
-## Configuration (`~/.devspace/config.jsonc`)
+## Configuration (`~/.gemini-workspace/config.jsonc`)
 
 ```jsonc
 {

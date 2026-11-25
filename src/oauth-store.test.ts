@@ -47,7 +47,7 @@ test("refresh tokens without a resource are rejected when no alias is configured
 });
 
 async function stateDirFixture(t: TestContext, name: string): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "devspace-oauth-test-"));
+  const root = await mkdtemp(join(tmpdir(), "gemini-workspace-oauth-test-"));
   t.after(() => rm(root, { recursive: true, force: true }));
 
   return join(root, name);

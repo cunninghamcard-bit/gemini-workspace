@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 const packageJson = require("../package.json") as { version?: unknown };
 
 if (!isJsonString(packageJson.version) || !packageJson.version) {
-  throw new Error("DevSpace package version is missing.");
+  throw new Error("Gemini Workspace package version is missing.");
 }
 
-export const DEVSPACE_VERSION = packageJson.version;
+export const GEMINI_WORKSPACE_VERSION = packageJson.version;

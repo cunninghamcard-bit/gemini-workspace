@@ -19,51 +19,51 @@ import {
 } from "jsonc-parser";
 import * as z from "zod/v4";
 import {
-  defaultDevspaceConfig,
-  devspaceConfigSchema,
-  type DevspaceConfig,
-  type DevspaceConfigInput,
+  defaultGeminiWorkspaceConfig,
+  geminiWorkspaceConfigSchema,
+  type GeminiWorkspaceConfig,
+  type GeminiWorkspaceConfigInput,
 } from "./config-schema.js";
 import { expandHomePath } from "./path-utils.js";
 
-const devspaceAuthConfigSchema = z.object({
+const geminiWorkspaceAuthConfigSchema = z.object({
   ownerToken: z.string().optional(),
 }).passthrough();
 
-export type DevspaceUserConfig = DevspaceConfig;
-export type DevspaceAuthConfig = z.infer<typeof devspaceAuthConfigSchema>;
+export type GeminiWorkspaceUserConfig = GeminiWorkspaceConfig;
+export type GeminiWorkspaceAuthConfig = z.infer<typeof geminiWorkspaceAuthConfigSchema>;
 
-export interface DevspaceFiles {
+export interface GeminiWorkspaceFiles {
   dir: string;
   configPath: string;
   authPath: string;
   configExists: boolean;
   authExists: boolean;
-  config: DevspaceConfig;
-  auth: DevspaceAuthConfig;
+  config: GeminiWorkspaceConfig;
+  auth: GeminiWorkspaceAuthConfig;
 }
 
-export interface DevspaceConfigEdit {
+export interface GeminiWorkspaceConfigEdit {
   path: (string | number)[];
   value: unknown;
 }
 
-export function devspaceConfigDir(env: NodeJS.ProcessEnv = process.env): string {
-  return resolve(expandHomePath(env.DEVSPACE_CONFIG_DIR ?? join(homedir(), ".devspace")));
+export function geminiWorkspaceConfigDir(env: NodeJS.ProcessEnv = process.env): string {
+  return resolve(expandHomePath(env.GEMINI_WORKSPACE_CONFIG_DIR ?? join(homedir(), ".gemini-workspace")));
 }
 
-export function devspaceConfigPath(env: NodeJS.ProcessEnv = process.env): string {
-  return join(devspaceConfigDir(env), "config.jsonc");
+export function geminiWorkspaceConfigPath(env: NodeJS.ProcessEnv = process.env): string {
+  return join(geminiWorkspaceConfigDir(env), "config.jsonc");
 }
 
-export function devspaceAuthPath(env: NodeJS.ProcessEnv = process.env): string {
-  return join(devspaceConfigDir(env), "auth.json");
+export function geminiWorkspaceAuthPath(env: NodeJS.ProcessEnv = process.env): string {
+  return join(geminiWorkspaceConfigDir(env), "auth.json");
 }
 
-export function loadDevspaceFiles(env: NodeJS.ProcessEnv = process.env): DevspaceFiles {
-  const dir = devspaceConfigDir(env);
-  const configPath = devspaceConfigPath(env);
-  const authPath = devspaceAuthPath(env);
+export function loadGeminiWorkspaceFiles(env: NodeJS.ProcessEnv = process.env): GeminiWorkspaceFiles {
+  const dir = geminiWorkspaceConfigDir(env);
+  const configPath = geminiWorkspaceConfigPath(env);
+  const authPath = geminiWorkspaceAuthPath(env);
 
   const configExists = existsSync(configPath);
   const authExists = existsSync(authPath);
@@ -74,34 +74,34 @@ export function loadDevspaceFiles(env: NodeJS.ProcessEnv = process.env): Devspac
     authPath,
     configExists,
     authExists,
-    config: configExists ? readJsoncConfig(configPath) : defaultDevspaceConfig(),
-    auth: authExists ? readJsonFile(authPath, devspaceAuthConfigSchema) : {},
+    config: configExists ? readJsoncConfig(configPath) : defaultGeminiWorkspaceConfig(),
+    auth: authExists ? readJsonFile(authPath, geminiWorkspaceAuthConfigSchema) : {},
   };
 }
 
-export function writeDevspaceConfig(
-  config: DevspaceConfigInput,
+export function writeGeminiWorkspaceConfig(
+  config: GeminiWorkspaceConfigInput,
   env: NodeJS.ProcessEnv = process.env,
 ): string {
-  const filePath = devspaceConfigPath(env);
-  const parsed = devspaceConfigSchema.parse(config);
+  const filePath = geminiWorkspaceConfigPath(env);
+  const parsed = geminiWorkspaceConfigSchema.parse(config);
   atomicWrite(filePath, serializeConfig(parsed), 0o600);
   return filePath;
 }
 
-export function setDevspaceConfigValue(
+export function setGeminiWorkspaceConfigValue(
   path: (string | number)[],
   value: WireInput,
   env: NodeJS.ProcessEnv = process.env,
 ): string {
-  return setDevspaceConfigValues([{ path, value }], env);
+  return setGeminiWorkspaceConfigValues([{ path, value }], env);
 }
 
-export function setDevspaceConfigValues(
-  edits: DevspaceConfigEdit[],
+export function setGeminiWorkspaceConfigValues(
+  edits: GeminiWorkspaceConfigEdit[],
   env: NodeJS.ProcessEnv = process.env,
 ): string {
-  const files = loadDevspaceFiles(env);
+  const files = loadGeminiWorkspaceFiles(env);
   const source = files.configExists
     ? readFileSync(files.configPath, "utf8")
     : serializeConfig(files.config);
@@ -118,13 +118,13 @@ export function setDevspaceConfigValues(
   return files.configPath;
 }
 
-export function writeDevspaceAuth(
-  auth: DevspaceAuthConfig,
+export function writeGeminiWorkspaceAuth(
+  auth: GeminiWorkspaceAuthConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): string {
-  const filePath = devspaceAuthPath(env);
-  mkdirSync(devspaceConfigDir(env), { recursive: true });
-  writeFileSync(filePath, `${JSON.stringify(devspaceAuthConfigSchema.parse(auth), null, 2)}\n`, { mode: 0o600 });
+  const filePath = geminiWorkspaceAuthPath(env);
+  mkdirSync(geminiWorkspaceConfigDir(env), { recursive: true });
+  writeFileSync(filePath, `${JSON.stringify(geminiWorkspaceAuthConfigSchema.parse(auth), null, 2)}\n`, { mode: 0o600 });
   return filePath;
 }
 
@@ -132,34 +132,34 @@ export function generateOwnerToken(): string {
   return randomBytes(32).toString("base64url");
 }
 
-function readJsoncConfig(filePath: string): DevspaceConfig {
+function readJsoncConfig(filePath: string): GeminiWorkspaceConfig {
   try {
     return parseJsoncConfig(readFileSync(filePath, "utf8"), filePath);
   } catch (error) {
-    if (error instanceof DevspaceConfigFileError) throw error;
+    if (error instanceof GeminiWorkspaceConfigFileError) throw error;
     throw fileError("read", filePath, error);
   }
 }
 
-function parseJsoncConfig(source: string, filePath: string): DevspaceConfig {
+function parseJsoncConfig(source: string, filePath: string): GeminiWorkspaceConfig {
   const errors: ParseError[] = [];
   const value = parse(source, errors, { allowTrailingComma: true });
 
   if (errors.length > 0) {
     const first = errors[0]!;
-    throw new DevspaceConfigFileError(
+    throw new GeminiWorkspaceConfigFileError(
       `Unable to read ${filePath}: ${printParseErrorCode(first.error)} at offset ${first.offset}`,
     );
   }
 
   try {
-    return devspaceConfigSchema.parse(value);
+    return geminiWorkspaceConfigSchema.parse(value);
   } catch (error) {
     throw fileError("read", filePath, error);
   }
 }
 
-function serializeConfig(config: DevspaceConfig): string {
+function serializeConfig(config: GeminiWorkspaceConfig): string {
   return `${JSON.stringify(config, null, 2)}\n`;
 }
 
@@ -189,7 +189,7 @@ function readJsonFile<T>(filePath: string, schema: z.ZodType<T>): T {
 
 function fileError(action: "read", filePath: string, error: WireInput): Error {
   const reason = error instanceof Error ? error.message : String(error);
-  return new DevspaceConfigFileError(`Unable to ${action} ${filePath}: ${reason}`);
+  return new GeminiWorkspaceConfigFileError(`Unable to ${action} ${filePath}: ${reason}`);
 }
 
-class DevspaceConfigFileError extends Error {}
+class GeminiWorkspaceConfigFileError extends Error {}
