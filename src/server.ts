@@ -13,6 +13,7 @@ import { ActivityStore } from "./activity-store.js";
 import { createActivityWebRouter, WORKSPACE_WEB_PATH } from "./activity-web.js";
 import { AgyBridge, buildServerInstructions, type BridgeToolCallResult } from "./agy-bridge.js";
 import { CodeModeManager, codeModeToolDefinitions } from "./code-mode.js";
+import { callFastTool, fastToolDefinitions, isFastTool } from "./fast-tools.js";
 import { loadConfig, type ServerConfig } from "./config.js";
 import { logEvent, requestIp, requestPath } from "./logger.js";
 import { SingleUserOAuthProvider } from "./oauth-provider.js";
@@ -185,7 +186,7 @@ export async function createServer(
       mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
         const agyTools = await bridge.listTools();
         const extraTools = codeMode ? codeModeToolDefinitions(config.agy.holdMs) : [];
-        return { tools: [...agyTools, ...extraTools] };
+        return { tools: [...agyTools, ...fastToolDefinitions(), ...extraTools] };
       });
 
       mcpServer.setRequestHandler(CallToolRequestSchema, async (callReq) => {
@@ -196,6 +197,8 @@ export async function createServer(
         try {
           if (codeMode?.isCodeModeTool(name)) {
             result = await codeMode.callTool(incomingSessionId, name, toolArgs);
+          } else if (isFastTool(name)) {
+            result = await callFastTool(name, toolArgs);
           } else {
             result = await bridge.callTool(incomingSessionId, name, toolArgs);
           }

@@ -110,6 +110,7 @@ export function buildServerInstructions(
     `Non-daemon run_command calls automatically wait on the server for up to ${holdSeconds} seconds so most commands finish in one call.`,
     `If run_command exceeds ${holdSeconds} seconds and returns a background task id, call manage_task with Action "status" and that TaskId: the server holds each status check up to ${holdSeconds} seconds until the task finishes. Repeat until completion when your task depends on the output.`,
     "Completion notices for background tasks in your session are also appended to subsequent tool results.",
+    "Batch tools (always pass an absolute `cwd`): `batch_search` packs up to 20 text/regex/glob/fuzzy/read-only git queries into one call; `quick_outline` / `read_slices` map symbol line ranges in large files before ranged read_file; `apply_edits` applies atomic multi-hunk edits across files with an optional verify command; `run_checks` runs several independent commands (typecheck, lint, tests) concurrently with compact output.",
   ];
 
   if (options.codeModeEnabled) {

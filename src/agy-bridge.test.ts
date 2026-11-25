@@ -209,18 +209,23 @@ test(
     assert.ok(transportB.sessionId, "Sub Agent B received Mcp-Session-Id");
     assert.notEqual(transportA.sessionId, transportB.sessionId);
 
-    // 2. Verify exposed tools (5 agy + 3 Code Mode) and cleaned JSON schemas + skills instructions
+    // 2. Verify exposed tools (5 agy + 5 agy-fast + 3 Code Mode) and cleaned JSON schemas + skills instructions
     assert.match(subAgentA.getInstructions() ?? "", /demo-skill/);
     const { tools } = await subAgentA.listTools();
     assert.deepEqual(
       tools.map((tool) => tool.name).sort(),
       [
+        "apply_edits",
+        "batch_search",
         "cancel_execution",
         "edit_file",
         "execute",
         "manage_task",
         "poll_execution",
+        "quick_outline",
         "read_file",
+        "read_slices",
+        "run_checks",
         "run_command",
         "write_file",
       ],
