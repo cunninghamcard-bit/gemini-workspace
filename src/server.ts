@@ -107,7 +107,7 @@ export async function createServer(
       baseUrl: new URL(config.publicBaseUrl),
       resourceServerUrl,
       scopesSupported: config.oauth.scopes,
-      resourceName: "DevSpace",
+      resourceName: "Gemini Workspace",
     }),
   );
 
@@ -125,7 +125,7 @@ export async function createServer(
   app.get("/healthz", (_req, res) => {
     res.json({
       ok: true,
-      name: "devspace-agy-bridge",
+      name: "gemini-workspace",
       version: DEVSPACE_VERSION,
       activeSessions: bridge.activeSessionCount(),
       skillsCount: discoveredSkills.length,
@@ -176,7 +176,7 @@ export async function createServer(
       });
 
       const mcpServer = new Server(
-        { name: "devspace", version: DEVSPACE_VERSION },
+        { name: "gemini-workspace", version: DEVSPACE_VERSION },
         {
           capabilities: { tools: {} },
           instructions,
