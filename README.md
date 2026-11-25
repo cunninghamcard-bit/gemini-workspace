@@ -1,8 +1,8 @@
-# Gemini Space
+# Gemini Workspace
 
 **[English](./README.md) · [简体中文](./README.zh-CN.md)**
 
-[![CI](https://github.com/cunninghamcard-bit/gemini-space/actions/workflows/ci.yml/badge.svg)](https://github.com/cunninghamcard-bit/gemini-space/actions/workflows/ci.yml)
+[![CI](https://github.com/cunninghamcard-bit/gemini-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/cunninghamcard-bit/gemini-workspace/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node.js >= 22.19](https://img.shields.io/badge/node-%3E%3D22.19-339933.svg)](https://nodejs.org)
 
@@ -10,7 +10,7 @@
 
 ---
 
-## Why Gemini Space?
+## Why Gemini Workspace?
 
 Most local coding MCP servers (`Desktop Commander`, `DevSpace`, `Filesystem MCP`) were designed around ChatGPT / Codex (`exec_command`, `write_stdin`, `apply_patch`, `open_workspace`) or Claude Code. When you connect them to **Gemini Web (`gemini.google.com` → Custom Connectors)**, you hit two walls:
 
@@ -20,7 +20,7 @@ Most local coding MCP servers (`Desktop Commander`, `DevSpace`, `Filesystem MCP`
    - **~60s hard RPC timeout & no MCP `Tasks`**: Gemini Web declares MCP `2025-11-25` without `tasks` capability, ignores post-turn server push notifications, and kills any tool call exceeding ~60s (`DEADLINE_EXCEEDED`).
    - **Parallel Task Subagents**: In **Gemini Task** mode, Gemini spawns multiple cloud subagents that simultaneously `initialize` against your `/mcp` endpoint. Without session isolation and concurrent refresh-token rotation grace, subagents either block each other past 60s, leak background task notices across agents, or trigger `401` token-rotation races.
 
-**Gemini Space** is a lightweight, self-hosted MCP server built from the ground up around those exact constraints—with **zero closed-source binary dependencies** (only 6 runtime npm packages + Node's built-in `node:sqlite`).
+**Gemini Workspace** is a lightweight, self-hosted MCP server built from the ground up around those exact constraints—with **zero closed-source binary dependencies** (only 6 runtime npm packages + Node's built-in `node:sqlite`).
 
 ---
 
@@ -57,7 +57,7 @@ flowchart LR
 
   Tunnel["HTTPS Tunnel\n(Tailscale Funnel / Cloudflare)"]
 
-  subgraph Gemini Space (Local Mac / Linux)
+  subgraph Gemini Workspace (Local Mac / Linux)
     Auth["OAuth 2.1 + 300s Refresh Grace\n+ Gemini Schema Sanitizer"]
     Router["Soft Session Router\n(S1 / S2 Isolated Queues)"]
     Engine["Deterministic AGY Engine\n(80x24 PTY · 45s Hold · Multimodal FS)"]
@@ -82,8 +82,8 @@ flowchart LR
 ### 2. Clone & Build
 
 ```bash
-git clone https://github.com/cunninghamcard-bit/gemini-space.git
-cd gemini-space
+git clone https://github.com/cunninghamcard-bit/gemini-workspace.git
+cd gemini-workspace
 pnpm install
 pnpm build
 ```
@@ -95,13 +95,13 @@ pnpm build
 tailscale funnel --bg 7676
 
 # Initialize ~/.devspace/config.jsonc and generate your Owner Password in ~/.devspace/auth.json:
-./bin/gemini-space.js init --public-url https://your-machine.your-tailnet.ts.net
+./bin/gemini-workspace.js init --public-url https://your-machine.your-tailnet.ts.net
 
 # Verify everything is ready:
-./bin/gemini-space.js doctor
+./bin/gemini-workspace.js doctor
 
 # Start the server:
-./bin/gemini-space.js serve
+./bin/gemini-workspace.js serve
 ```
 
 > **Tip:** Your generated Owner Password is saved in `~/.devspace/auth.json` (`ownerToken`). You will enter it once when authorizing Gemini Web or signing into `https://<your-host>/web/`.
@@ -113,7 +113,7 @@ tailscale funnel --bg 7676
    ```text
    https://your-machine.your-tailnet.ts.net/mcp
    ```
-   *(Leave Client ID / Secret blank — Gemini Space supports dynamic OAuth client registration.)*
+   *(Leave Client ID / Secret blank — Gemini Workspace supports dynamic OAuth client registration.)*
 3. Approve the connection using your **Owner Password** from `~/.devspace/auth.json`.
 4. Open a chat (or **Gemini Task**) and start coding directly against your local repositories!
 
@@ -123,23 +123,23 @@ tailscale funnel --bg 7676
 
 ## Running as a Background Service (`launchd` on macOS)
 
-Create `~/Library/LaunchAgents/dev.gemini-space.server.plist`:
+Create `~/Library/LaunchAgents/dev.gemini-workspace.server.plist`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>Label</key><string>dev.gemini-space.server</string>
+  <key>Label</key><string>dev.gemini-workspace.server</string>
   <key>ProgramArguments</key>
   <array>
     <string>/opt/homebrew/bin/node</string>
     <string>--import</string>
-    <string>/ABSOLUTE/PATH/TO/gemini-space/bin/silence-sqlite-warning.js</string>
-    <string>/ABSOLUTE/PATH/TO/gemini-space/dist/cli.js</string>
+    <string>/ABSOLUTE/PATH/TO/gemini-workspace/bin/silence-sqlite-warning.js</string>
+    <string>/ABSOLUTE/PATH/TO/gemini-workspace/dist/cli.js</string>
     <string>serve</string>
   </array>
-  <key>WorkingDirectory</key><string>/ABSOLUTE/PATH/TO/gemini-space</string>
+  <key>WorkingDirectory</key><string>/ABSOLUTE/PATH/TO/gemini-workspace</string>
   <key>EnvironmentVariables</key>
   <dict>
     <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
@@ -147,8 +147,8 @@ Create `~/Library/LaunchAgents/dev.gemini-space.server.plist`:
   </dict>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
-  <key>StandardOutPath</key><string>/Users/YOUR_USERNAME/.devspace/logs/gemini-space.out.log</string>
-  <key>StandardErrorPath</key><string>/Users/YOUR_USERNAME/.devspace/logs/gemini-space.err.log</string>
+  <key>StandardOutPath</key><string>/Users/YOUR_USERNAME/.devspace/logs/gemini-workspace.out.log</string>
+  <key>StandardErrorPath</key><string>/Users/YOUR_USERNAME/.devspace/logs/gemini-workspace.err.log</string>
 </dict>
 </plist>
 ```
@@ -156,7 +156,7 @@ Create `~/Library/LaunchAgents/dev.gemini-space.server.plist`:
 Load it:
 
 ```bash
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.gemini-space.server.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.gemini-workspace.server.plist
 ```
 
 ---
@@ -201,11 +201,11 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.gemini-space.server.
 ## CLI Reference
 
 ```bash
-gemini-space serve                        # Start OAuth + MCP + /web/ server
-gemini-space doctor                       # Verify config, OAuth DB, discovered skills & tools
-gemini-space init --public-url <https>    # Initialize config.jsonc and Owner Password
-gemini-space config show                  # Print resolved configuration
-gemini-space config set codeMode.enabled false
+gemini-workspace serve                        # Start OAuth + MCP + /web/ server
+gemini-workspace doctor                       # Verify config, OAuth DB, discovered skills & tools
+gemini-workspace init --public-url <https>    # Initialize config.jsonc and Owner Password
+gemini-workspace config show                  # Print resolved configuration
+gemini-workspace config set codeMode.enabled false
 ```
 
 ---

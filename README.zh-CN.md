@@ -1,8 +1,8 @@
-# Gemini Space
+# Gemini Workspace
 
 **[English](./README.md) · [简体中文](./README.zh-CN.md)**
 
-[![CI](https://github.com/cunninghamcard-bit/gemini-space/actions/workflows/ci.yml/badge.svg)](https://github.com/cunninghamcard-bit/gemini-space/actions/workflows/ci.yml)
+[![CI](https://github.com/cunninghamcard-bit/gemini-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/cunninghamcard-bit/gemini-workspace/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node.js >= 22.19](https://img.shields.io/badge/node-%3E%3D22.19-339933.svg)](https://nodejs.org)
 
@@ -10,7 +10,7 @@
 
 ---
 
-## 为什么要做 Gemini Space？
+## 为什么要做 Gemini Workspace？
 
 市面上现有的本地编码 MCP 服务（如 `Desktop Commander`、`DevSpace`、`Filesystem MCP`）大多是按 ChatGPT / Codex（`exec_command`、`write_stdin`、`apply_patch`、`open_workspace`）或 Claude Code 的工具形态设计的。当你把它们挂进**网页版 Gemini（`gemini.google.com` → Custom Connectors）**时，会撞上两堵墙：
 
@@ -20,7 +20,7 @@
    - **单次调用约 60 秒硬超时 & 不支持 MCP `Tasks`**：Gemini 网页端虽然握手声明 `2025-11-25` 协议，但实际不带 `tasks` 能力，一轮结束后也不会因服务端推送通知自动唤醒；任何单次调用超过 ~60 秒就会报 `MCP request timed out (DEADLINE_EXCEEDED)`。
    - **Gemini Task 多子代理并发竞争**：在网页版 **Gemini Task** 模式下，云端会同时派出多个 Subagent 并发连接 `/mcp`（云端原生 Subagent 本身没有本地文件权限，全靠调这个 MCP 干活）。如果没有按会话隔离任务队列、没有做 Refresh Token 并发轮换防抖，多个子代理就会出现排队超 60s、后台任务通知串台，甚至并发刷新令牌触发 `401` 掉线。
 
-**Gemini Space** 针对上面每一个边界从头打磨：在纯 Node.js 中确定性复刻了整套 `agy` 工具语义，**不依赖闭源 `agy` 二进制，无需登录额外账号，生产依赖仅 6 个轻量 npm 包 + Node 内置 `node:sqlite`**。
+**Gemini Workspace** 针对上面每一个边界从头打磨：在纯 Node.js 中确定性复刻了整套 `agy` 工具语义，**不依赖闭源 `agy` 二进制，无需登录额外账号，生产依赖仅 6 个轻量 npm 包 + Node 内置 `node:sqlite`**。
 
 ---
 
@@ -56,8 +56,8 @@
 ### 2. 克隆与构建
 
 ```bash
-git clone https://github.com/cunninghamcard-bit/gemini-space.git
-cd gemini-space
+git clone https://github.com/cunninghamcard-bit/gemini-workspace.git
+cd gemini-workspace
 pnpm install
 pnpm build
 ```
@@ -69,13 +69,13 @@ pnpm build
 tailscale funnel --bg 7676
 
 # 生成 ~/.devspace/config.jsonc 并在 ~/.devspace/auth.json 中生成主人密码：
-./bin/gemini-space.js init --public-url https://你的机器名.你的tailnet.ts.net
+./bin/gemini-workspace.js init --public-url https://你的机器名.你的tailnet.ts.net
 
 # 自检配置、数据库、Skills 与工具列表：
-./bin/gemini-space.js doctor
+./bin/gemini-workspace.js doctor
 
 # 启动服务：
-./bin/gemini-space.js serve
+./bin/gemini-workspace.js serve
 ```
 
 > **提示：** 自动生成的主人密码保存在 `~/.devspace/auth.json` 的 `ownerToken` 字段中，连接 Gemini 和登录 `https://<你的域名>/web/` 时输入它即可。
@@ -105,11 +105,11 @@ tailscale funnel --bg 7676
 ## 常用命令
 
 ```bash
-gemini-space serve                        # 启动 OAuth + MCP + /web/ 服务
-gemini-space doctor                       # 检查配置、OAuth 数据库、已发现的本机 Skills 与工具
-gemini-space init --public-url <https>    # 初始化配置文件与主人密码
-gemini-space config show                  # 查看当前生效配置
-gemini-space config set codeMode.enabled false
+gemini-workspace serve                        # 启动 OAuth + MCP + /web/ 服务
+gemini-workspace doctor                       # 检查配置、OAuth 数据库、已发现的本机 Skills 与工具
+gemini-workspace init --public-url <https>    # 初始化配置文件与主人密码
+gemini-workspace config show                  # 查看当前生效配置
+gemini-workspace config set codeMode.enabled false
 ```
 
 ---

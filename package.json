@@ -1,10 +1,10 @@
 {
-  "name": "gemini-space",
+  "name": "gemini-workspace",
   "version": "1.0.0",
   "description": "Give Google Gemini Web (and Gemini Task subagents) native Antigravity-style local coding tools over MCP.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cunninghamcard-bit/gemini-space.git"
+    "url": "git+https://github.com/cunninghamcard-bit/gemini-workspace.git"
   },
   "type": "module",
   "main": "dist/server.js",
@@ -13,7 +13,7 @@
   },
   "packageManager": "pnpm@11.25.0",
   "bin": {
-    "gemini-space": "bin/gemini-space.js",
+    "gemini-workspace": "bin/gemini-workspace.js",
     "devspace": "bin/devspace.js"
   },
   "files": [

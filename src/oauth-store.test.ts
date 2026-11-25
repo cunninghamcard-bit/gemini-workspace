@@ -13,7 +13,7 @@ const oauthConfig = {
   ownerToken: "test-owner-token-that-is-long-enough",
   accessTokenTtlSeconds: 3600,
   refreshTokenTtlSeconds: 2592000,
-  scopes: ["devspace"],
+  scopes: ["gemini-workspace"],
   allowedResourceUrls: ["https://tunnel.example.com/v1/mcp/tunnel_123"],
   allowedRedirectHosts: ["chatgpt.com"],
 };
@@ -101,14 +101,14 @@ function testPersistenceAndTokenHashing(stateDir: string): void {
     accessTokenHash: hashToken(accessToken),
     accessToken: {
       clientId: client.client_id,
-      scopes: ["devspace"],
+      scopes: ["gemini-workspace"],
       expiresAt: Math.floor(Date.now() / 1000) + 3600,
       resource: mcpUrl.href,
     },
     refreshTokenHash: hashToken(refreshToken),
     refreshToken: {
       clientId: client.client_id,
-      scopes: ["devspace"],
+      scopes: ["gemini-workspace"],
       expiresAt: Math.floor(Date.now() / 1000) + 2592000,
       resource: mcpUrl.href,
     },
@@ -158,9 +158,9 @@ function testExpiredTokenCleanup(stateDir: string): void {
   const expiredAt = Math.floor(Date.now() / 1000) - 1;
   store.saveTokenPair({
     accessTokenHash: "expired-access-hash",
-    accessToken: { clientId: client.client_id, scopes: ["devspace"], expiresAt: expiredAt },
+    accessToken: { clientId: client.client_id, scopes: ["gemini-workspace"], expiresAt: expiredAt },
     refreshTokenHash: "expired-refresh-hash",
-    refreshToken: { clientId: client.client_id, scopes: ["devspace"], expiresAt: expiredAt },
+    refreshToken: { clientId: client.client_id, scopes: ["gemini-workspace"], expiresAt: expiredAt },
   });
   store.close();
 
@@ -185,7 +185,7 @@ function testTransactionalTokenRotation(stateDir: string): void {
     const expiresAt = Math.floor(Date.now() / 1000) + 3600;
     store.saveRefreshToken("old-refresh-hash", {
       clientId: client.client_id,
-      scopes: ["devspace"],
+      scopes: ["gemini-workspace"],
       expiresAt,
     });
 
@@ -193,9 +193,9 @@ function testTransactionalTokenRotation(stateDir: string): void {
       store.saveTokenPair(
         {
           accessTokenHash: "new-access-hash",
-          accessToken: { clientId: client.client_id, scopes: ["devspace"], expiresAt },
+          accessToken: { clientId: client.client_id, scopes: ["gemini-workspace"], expiresAt },
           refreshTokenHash: "new-refresh-hash",
-          refreshToken: { clientId: client.client_id, scopes: ["devspace"], expiresAt },
+          refreshToken: { clientId: client.client_id, scopes: ["gemini-workspace"], expiresAt },
         },
         "old-refresh-hash",
       ),
@@ -209,9 +209,9 @@ function testTransactionalTokenRotation(stateDir: string): void {
       store.saveTokenPair(
         {
           accessTokenHash: "losing-access-hash",
-          accessToken: { clientId: client.client_id, scopes: ["devspace"], expiresAt },
+          accessToken: { clientId: client.client_id, scopes: ["gemini-workspace"], expiresAt },
           refreshTokenHash: "losing-refresh-hash",
-          refreshToken: { clientId: client.client_id, scopes: ["devspace"], expiresAt },
+          refreshToken: { clientId: client.client_id, scopes: ["gemini-workspace"], expiresAt },
         },
         "old-refresh-hash",
       ),
@@ -245,7 +245,7 @@ async function testProviderRestartRotationAndRevocation(stateDir: string): Promi
     params: {
       redirectUri,
       codeChallenge: "challenge",
-      scopes: ["devspace"],
+      scopes: ["gemini-workspace"],
       resource: tunnelUrl,
     },
     expiresAtMs: Date.now() + 60_000,
@@ -289,14 +289,14 @@ async function testProviderRestartRotationAndRevocation(stateDir: string): Promi
     assert.equal(verified.resource?.href, tunnelUrl.href);
 
     await assert.rejects(
-      secondProvider.exchangeRefreshToken(client, issued.refresh_token, ["devspace"], mcpUrl),
+      secondProvider.exchangeRefreshToken(client, issued.refresh_token, ["gemini-workspace"], mcpUrl),
       InvalidGrantError,
     );
 
     const refreshed = await secondProvider.exchangeRefreshToken(
       client,
       issued.refresh_token,
-      ["devspace"],
+      ["gemini-workspace"],
       tunnelUrl,
     );
 
@@ -308,7 +308,7 @@ async function testProviderRestartRotationAndRevocation(stateDir: string): Promi
     assert.equal((await secondProvider.verifyAccessToken(inherited.access_token)).resource?.href, tunnelUrl.href);
 
     await assert.rejects(
-      secondProvider.exchangeRefreshToken(client, issued.refresh_token, ["devspace"], tunnelUrl),
+      secondProvider.exchangeRefreshToken(client, issued.refresh_token, ["gemini-workspace"], tunnelUrl),
       InvalidGrantError,
     );
 
@@ -317,7 +317,7 @@ async function testProviderRestartRotationAndRevocation(stateDir: string): Promi
 
     await secondProvider.revokeToken(client, { token: inherited.refresh_token });
     await assert.rejects(
-      secondProvider.exchangeRefreshToken(client, inherited.refresh_token, ["devspace"], tunnelUrl),
+      secondProvider.exchangeRefreshToken(client, inherited.refresh_token, ["gemini-workspace"], tunnelUrl),
       InvalidGrantError,
     );
   } finally {
@@ -331,7 +331,7 @@ async function testRefreshResourcePolicy(stateDir: string): Promise<void> {
 
   for (const [token, resource] of [["canonical", mcpUrl.href], ["missing", undefined]] as const) {
     store.saveRefreshToken(hashToken(token), {
-      clientId: client.client_id, scopes: ["devspace"],
+      clientId: client.client_id, scopes: ["gemini-workspace"],
       expiresAt: Math.floor(Date.now() / 1000) + 3600, resource,
     });
   }

@@ -76,7 +76,7 @@ export async function createServer(
 
   const bearerAuth = requireBearerAuth({
     verifier: oauthProvider,
-    requiredScopes: [config.oauth.scopes[0] ?? "devspace"],
+    requiredScopes: [config.oauth.scopes[0] ?? "gemini-workspace"],
     resourceMetadataUrl: getOAuthProtectedResourceMetadataUrl(resourceServerUrl),
   });
 

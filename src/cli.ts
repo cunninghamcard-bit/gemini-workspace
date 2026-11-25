@@ -73,7 +73,7 @@ function normalizeCommand(raw: string | undefined): Command {
 async function runServe(): Promise<void> {
   const { app, config, close } = await createServer();
   const httpServer = app.listen(config.listenPort, config.host, () => {
-    console.log(`devspace agy-bridge listening on http://${config.host}:${config.listenPort}/mcp`);
+    console.log(`gemini-workspace agy-bridge listening on http://${config.host}:${config.listenPort}/mcp`);
     console.log(`public base url: ${config.publicBaseUrl}`);
     console.log(`agy binary: ${config.agy.bin}`);
     console.log(`agy workspace: ${config.agy.workspace}`);
@@ -87,7 +87,7 @@ async function runServe(): Promise<void> {
     void shutdownHttpServer(httpServer, close)
       .then(() => process.exit(0))
       .catch((error) => {
-        console.error("devspace shutdown failed", error);
+        console.error("gemini-workspace shutdown failed", error);
         process.exit(1);
       });
   };
@@ -193,20 +193,20 @@ function runConfigCommand(args: string[]): void {
     console.log(`Updated ${updatedPath}`);
     return;
   }
-  throw new Error("Usage: devspace config [show | set <dot.path> <json-or-string>]");
+  throw new Error("Usage: gemini-workspace config [show | set <dot.path> <json-or-string>]");
 }
 
 function printHelp(): void {
   console.log(
     [
-      "devspace — Gemini Web AGY MCP Bridge",
+      "gemini-workspace — Gemini Web AGY MCP Bridge",
       "",
       "Commands:",
-      "  devspace serve              Start the OAuth + AGY MCP bridge server",
-      "  devspace doctor             Verify config, OAuth SQLite state, and live agy bridge tools",
-      "  devspace init [--public-url <url>]  Initialize config.jsonc and owner password",
-      "  devspace config [show | set <key> <value>]",
-      "  devspace version",
+      "  gemini-workspace serve              Start the OAuth + AGY MCP bridge server",
+      "  gemini-workspace doctor             Verify config, OAuth SQLite state, and live agy bridge tools",
+      "  gemini-workspace init [--public-url <url>]  Initialize config.jsonc and owner password",
+      "  gemini-workspace config [show | set <key> <value>]",
+      "  gemini-workspace version",
     ].join("\n"),
   );
 }

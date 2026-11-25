@@ -13,7 +13,7 @@ const baseConfig: OAuthConfig = {
   ownerToken: "test-owner-token-that-is-long-enough",
   accessTokenTtlSeconds: 3600,
   refreshTokenTtlSeconds: 2592000,
-  scopes: ["devspace", "read"],
+  scopes: ["gemini-workspace", "read"],
   allowedResourceUrls: ["https://tunnel.example.com/v1/mcp/tunnel_123"],
   allowedRedirectHosts: ["chatgpt.com"],
 };
@@ -217,7 +217,7 @@ async function issueInitialTokens(provider: SingleUserOAuthProvider) {
     params: {
       redirectUri,
       codeChallenge: "challenge",
-      scopes: ["devspace"],
+      scopes: ["gemini-workspace"],
       resource,
     },
     expiresAtMs: Date.now() + 60_000,

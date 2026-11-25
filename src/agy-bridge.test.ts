@@ -101,7 +101,7 @@ test(
         accessTokenTtlSeconds: 3600,
         refreshTokenTtlSeconds: 86400,
         refreshTokenGraceSeconds: 300,
-        scopes: ["devspace"],
+        scopes: ["gemini-workspace"],
         allowedResourceUrls: [],
         allowedRedirectHosts: ["localhost", "127.0.0.1"],
       },
@@ -164,7 +164,7 @@ test(
       params: {
         redirectUri: "http://127.0.0.1/callback",
         codeChallenge: "c",
-        scopes: ["devspace"],
+        scopes: ["gemini-workspace"],
         resource: mcpUrl,
       },
       expiresAtMs: Date.now() + 60_000,

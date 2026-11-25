@@ -59,7 +59,7 @@ function formHtml(params: {
   resource?: URL;
   fields: Record<string, string | undefined>;
 }): string {
-  const scopeText = params.scopes.length > 0 ? params.scopes.join(" ") : "devspace";
+  const scopeText = params.scopes.length > 0 ? params.scopes.join(" ") : "gemini-workspace";
   const resourceText = params.resource?.href ?? "DevSpace MCP endpoint";
 
   const error = params.error
