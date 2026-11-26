@@ -120,7 +120,7 @@ function requestedScopesAllowed(requested: string[], supported: string[]): boole
 // Tokens issued before the rename carry the old "devspace" scope.
 const LEGACY_SCOPE_ALIASES: Readonly<Record<string, string>> = { devspace: "gemini-workspace" };
 
-function canonicalScopes(scopes: string[]): string[] {
+export function canonicalScopes(scopes: string[]): string[] {
   return [...new Set(scopes.map((scope) => LEGACY_SCOPE_ALIASES[scope] ?? scope))];
 }
 

@@ -4,6 +4,7 @@ import { join, resolve } from "node:path";
 import type { LoggingConfig } from "./logger.js";
 import type { OAuthConfig } from "./oauth-provider.js";
 import { expandHomePath } from "./path-utils.js";
+import { canonicalScopes } from "./oauth-provider.js";
 import { loadGeminiWorkspaceFiles } from "./user-config.js";
 
 export interface AgyBridgeConfig {
@@ -88,7 +89,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
       accessTokenTtlSeconds: stored.oauth.accessTokenTtlSeconds,
       refreshTokenTtlSeconds: stored.oauth.refreshTokenTtlSeconds,
       refreshTokenGraceSeconds: stored.oauth.refreshTokenGraceSeconds,
-      scopes: stored.oauth.scopes,
+      scopes: canonicalScopes(stored.oauth.scopes),
       allowedResourceUrls: stored.oauth.allowedResourceUrls,
       allowedRedirectHosts: stored.oauth.allowedRedirectHosts,
     },
