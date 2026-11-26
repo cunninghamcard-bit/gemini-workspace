@@ -117,6 +117,13 @@ function requestedScopesAllowed(requested: string[], supported: string[]): boole
   return requested.every((scope) => supported.includes(scope));
 }
 
+// Tokens issued before the rename carry the old "devspace" scope.
+const LEGACY_SCOPE_ALIASES: Readonly<Record<string, string>> = { devspace: "gemini-workspace" };
+
+function canonicalScopes(scopes: string[]): string[] {
+  return [...new Set(scopes.map((scope) => LEGACY_SCOPE_ALIASES[scope] ?? scope))];
+}
+
 export class SingleUserOAuthProvider implements OAuthServerProvider {
   readonly clientsStore: OAuthRegisteredClientsStore;
   private readonly codes = new Map<string, AuthorizationCodeRecord>();
@@ -142,6 +149,8 @@ export class SingleUserOAuthProvider implements OAuthServerProvider {
     params: AuthorizationParams,
     res: Response,
   ): Promise<void> {
+    if (params.scopes) params = { ...params, scopes: canonicalScopes(params.scopes) };
+
     if (!params.resource || !this.isResourceAllowed(params.resource)) {
       throw new InvalidRequestError("Invalid or missing OAuth resource");
     }
@@ -249,9 +258,10 @@ export class SingleUserOAuthProvider implements OAuthServerProvider {
       throw new InvalidGrantError("Invalid resource");
     }
 
-    const requestedScopes = scopes ?? record.scopes;
+    const grantedScopes = canonicalScopes(record.scopes);
+    const requestedScopes = scopes ? canonicalScopes(scopes) : grantedScopes;
 
-    if (!requestedScopes.every((scope) => record.scopes.includes(scope))) {
+    if (!requestedScopes.every((scope) => grantedScopes.includes(scope))) {
       throw new AccessDeniedError("Refresh token cannot grant requested scopes");
     }
 
@@ -273,7 +283,7 @@ export class SingleUserOAuthProvider implements OAuthServerProvider {
     return {
       token,
       clientId: record.clientId,
-      scopes: record.scopes,
+      scopes: canonicalScopes(record.scopes),
       expiresAt: record.expiresAt,
       resource: record.resource ? new URL(record.resource) : undefined,
     };

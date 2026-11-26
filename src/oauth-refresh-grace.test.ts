@@ -40,6 +40,20 @@ test("grace reuse keeps the client, scope, and resource checks", async (t) => {
   await testGraceDoesNotRelaxRefreshPolicy(await fixture(t));
 });
 
+test("tokens issued with the legacy devspace scope keep working and refresh to gemini-workspace", async (t) => {
+  const provider = new SingleUserOAuthProvider(baseConfig, serverUrl, join(await fixture(t), "legacy"));
+  try {
+    const { client, tokens } = await issueInitialTokens(provider, ["devspace"]);
+    assert.deepEqual((await provider.verifyAccessToken(tokens.access_token)).scopes, ["gemini-workspace"]);
+
+    const refreshed = await provider.exchangeRefreshToken(client, tokens.refresh_token, ["devspace"]);
+    assert.equal(refreshed.scope, "gemini-workspace");
+    assert.deepEqual((await provider.verifyAccessToken(refreshed.access_token)).scopes, ["gemini-workspace"]);
+  } finally {
+    provider.close();
+  }
+});
+
 async function fixture(t: TestContext): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "gemini-workspace-oauth-grace-test-"));
   t.after(async () => {
@@ -204,7 +218,7 @@ async function testGraceDoesNotRelaxRefreshPolicy(root: string): Promise<void> {
   }
 }
 
-async function issueInitialTokens(provider: SingleUserOAuthProvider) {
+async function issueInitialTokens(provider: SingleUserOAuthProvider, scopes = ["gemini-workspace"]) {
   const client = await provider.clientsStore.registerClient?.({
     redirect_uris: [redirectUri],
     client_name: "Test client",
@@ -217,7 +231,7 @@ async function issueInitialTokens(provider: SingleUserOAuthProvider) {
     params: {
       redirectUri,
       codeChallenge: "challenge",
-      scopes: ["gemini-workspace"],
+      scopes,
       resource,
     },
     expiresAtMs: Date.now() + 60_000,
