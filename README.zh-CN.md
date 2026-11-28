@@ -95,6 +95,23 @@ tailscale funnel --bg 7676
 
 ---
 
+## 本地 stdio 用法（Gemini 桌面 App）
+
+网页版 Gemini 走的是远程 Connector（HTTP + OAuth）；**Gemini 桌面 App 的「本地 MCP」是另一套机制**——它 spawn 一条命令，通过 stdin/stdout 讲 JSON-RPC。所以本仓库同时提供了 stdio 入口：不需要公网隧道，也不需要 OAuth。
+
+1. 打开 Gemini 桌面 App → 设置 → 设置自定义的关联应用 → **本地 MCP**
+2. Command 填入（用绝对路径）：
+   ```bash
+   /absolute/path/to/node /absolute/path/to/gemini-space/bin/mcp-stdio.js
+   ```
+3. 点 Next 完成。
+
+在源码目录里也可以直接 `pnpm start:stdio`。工具集与 HTTP 模式完全一致：`read_file`、`write_file`、`edit_file`、`run_command`、`manage_task`，以及 Code Mode 开启时的 `execute` / `poll_execution` / `cancel_execution`。
+
+> **stdout 就是协议通道。** stdio 模式下任何一行非 JSON-RPC 的输出都会让客户端解析失败，因此该入口把 `console.log/info/debug` 全部重定向到 stderr，并且不启用 `/web/` 审计面板。权限范围仍由 `~/.devspace/config.jsonc` 里的 `agy.workspace` 决定。
+
+---
+
 ## 与 T3 Code 搭配使用（多模型异构协作）
 
 如果你想让网页版 Gemini 在遇到大型架构改动或跨模型交叉 Review 时，顺手调度本机的 **Claude Code / Codex / Grok / DeepSeek** 线程并在桌面 GUI 中实时查看：
