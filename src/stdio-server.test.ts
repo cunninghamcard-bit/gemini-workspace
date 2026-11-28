@@ -140,6 +140,38 @@ test("stdio server omits code mode tools when the feature is disabled", async ()
   }
 });
 
+test("stdio server annotates tools so clients can distinguish reads from writes", async () => {
+  const harness = await startStdioHarness(true);
+
+  try {
+    const { tools } = await harness.client.listTools();
+    const byName = new Map(tools.map((tool) => [tool.name, tool]));
+
+    assert.deepEqual(byName.get("poll_execution")?.annotations, {
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    });
+
+    // read_file must keep prompting: file reads are not bounded by agy.workspace.
+    assert.deepEqual(byName.get("read_file")?.annotations, {
+      readOnlyHint: false,
+      destructiveHint: true,
+      openWorldHint: false,
+    });
+
+    for (const name of ["write_file", "edit_file", "run_command", "manage_task"]) {
+      assert.equal(
+        byName.get(name)?.annotations?.readOnlyHint,
+        false,
+        `${name} must not claim to be read-only`,
+      );
+    }
+  } finally {
+    await harness.close();
+  }
+});
+
 test("stdio server serves tool calls through the in-process bridge", async () => {
   const harness = await startStdioHarness(true);
 
