@@ -14,7 +14,8 @@
   "packageManager": "pnpm@11.25.0",
   "bin": {
     "gemini-space": "bin/gemini-space.js",
-    "devspace": "bin/devspace.js"
+    "devspace": "bin/devspace.js",
+    "gemini-space-stdio": "bin/mcp-stdio.js"
   },
   "files": [
     "bin",
@@ -27,6 +28,7 @@
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "build": "pnpm clean && tsc -p tsconfig.build.json",
     "start": "node --import ./bin/silence-sqlite-warning.js dist/cli.js serve",
+    "start:stdio": "node bin/mcp-stdio.js",
     "test": "tsx --import ./bin/silence-sqlite-warning.js --test --test-concurrency=1 \"src/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
