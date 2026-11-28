@@ -121,6 +121,23 @@ tailscale funnel --bg 7676
 
 ---
 
+## Local stdio usage (Gemini desktop app)
+
+Web Gemini uses a remote connector over HTTPS + OAuth. The **Gemini desktop app's "Local MCP" is a different mechanism**: it spawns a command and speaks JSON-RPC over stdin/stdout. This repository ships a stdio entry for exactly that — no public tunnel, no OAuth.
+
+1. Gemini desktop app → Settings → Set up custom connected app → **Local MCP**
+2. Command (absolute paths required):
+   ```bash
+   /absolute/path/to/node /absolute/path/to/gemini-space/bin/mcp-stdio.js
+   ```
+3. Click Next.
+
+In a source checkout you can also run `pnpm start:stdio`. The tool set is identical to HTTP mode: `read_file`, `write_file`, `edit_file`, `run_command`, `manage_task`, plus `execute` / `poll_execution` / `cancel_execution` when Code Mode is enabled.
+
+> **stdout is the protocol channel.** Any non-JSON-RPC output on stdout breaks the client's parser, so this entry redirects `console.log/info/debug` to stderr and does not start the `/web/` audit panel. File access is still governed by `agy.workspace` in `~/.devspace/config.jsonc`.
+
+---
+
 ## Running as a Background Service (`launchd` on macOS)
 
 Create `~/Library/LaunchAgents/dev.gemini-space.server.plist`:
